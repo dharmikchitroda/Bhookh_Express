@@ -1,0 +1,210 @@
+package com.example.fooddelivery
+
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import com.example.fooddelivery.ui.CartScreen
+import com.example.fooddelivery.ui.FoodViewModel
+import com.example.fooddelivery.ui.InternetItemsScreen
+import com.example.fooddelivery.ui.ScreenName
+import com.example.fooddelivery.ui.Splash
+import com.example.fooddelivery.ui.StartScreen
+
+data class CardData(var img: Int, var name: String)
+
+
+object FoodDataSource {
+    val foodList = listOf(
+
+        CardData(R.drawable.hvww, "Fresh Fruits"),
+        CardData(R.drawable.khg, "Pizza"),
+        CardData(R.drawable.jgv, "Fresh Vegetables"),
+        CardData(R.drawable.hvww, "Beverages"),
+        CardData(R.drawable.bollsw, "Fresh Vegetables"),
+
+        )
+}
+
+
+@Composable
+fun Main() {
+    val abddbb: FoodViewModel = viewModel()
+    val state by abddbb.uistate.collectAsState()
+    val isvisible by abddbb.IsVisible.collectAsState()
+    val navController = rememberNavController()
+
+    //detect the current screen
+    val BackStackEntry by navController.currentBackStackEntryAsState() // backstack mathi current backstack ni infor aapshe
+    val currentRoute = BackStackEntry?.destination?.route
+        ?: ScreenName.first // return first screen ho to → "first" or second screen ho to → "second"
+
+    // for splash screen
+    if (isvisible == true) {
+        Splash()
+    } else {
+        Scaffold(
+            topBar = {
+                CustomTopBar(
+                    showBackArrow = currentRoute != ScreenName.first,
+                    onBackClick = { navController.popBackStack() }
+                )
+            },
+            bottomBar = { CustomBottomBar(navController, currentRoute) }) { paddingValues ->
+
+            NavHost(
+                navController = navController,
+                startDestination = ScreenName.first,
+                modifier = Modifier.padding(paddingValues)
+            ) {
+                composable(ScreenName.first) {
+                    StartScreen { selectedName ->
+                        abddbb.EventChange(selectedName)
+                        navController.navigate(ScreenName.second)
+                    }
+                }
+                composable(ScreenName.second) {
+                    InternetItemsScreen(abddbb)
+                }
+                composable(ScreenName.Third) {
+                    CartScreen(abddbb)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun CustomTopBar(showBackArrow: Boolean, onBackClick: () -> Unit) {
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color(0xFFFF8200))
+            .statusBarsPadding()
+            .padding(horizontal = 16.dp, vertical = 14.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            if (showBackArrow) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back",
+                    tint = Color.White,
+                    modifier = Modifier
+                        .size(26.dp)
+                        .clickable { onBackClick() }
+                )
+
+                Spacer(modifier = Modifier.width(8.dp))
+            }
+
+
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Text(
+                text = "Bhookh Express",
+                color = Color.Black,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+        Row {
+            Spacer(modifier = Modifier.width(12.dp))
+
+            Icon(
+                imageVector = Icons.Default.Person,
+                contentDescription = "User",
+                tint = Color.White,
+                modifier = Modifier.size(26.dp)
+            )
+        }
+    }
+}
+
+@Composable
+fun CustomBottomBar(navController: NavController, currentroute: String) {
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color(0xFFFF8200))
+            .padding(vertical = 12.dp),
+        horizontalArrangement = Arrangement.SpaceAround
+
+    ) {
+
+        // Home icon
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.clickable {}
+        ) {
+            Icon(
+                imageVector = Icons.Default.Home,
+                contentDescription = "Home",
+                tint = Color.White,
+                modifier = Modifier
+                    .size(28.dp)
+            )
+            Text(
+                text = "Home", color = Color.White, fontSize = 12.sp
+            )
+        }
+
+        // Cart icon
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.clickable {
+                if (currentroute != ScreenName.Third){
+                    navController.navigate(ScreenName.Third)
+                }
+
+            },
+        ) {
+            Icon(
+                imageVector = Icons.Default.ShoppingCart,
+                contentDescription = "Cart",
+                tint = Color.White,
+                modifier = Modifier
+                    .size(28.dp)
+            )
+            Text(
+                text = "Cart", color = Color.White, fontSize = 12.sp
+            )
+        }
+    }
+}
