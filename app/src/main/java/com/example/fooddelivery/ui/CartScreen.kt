@@ -94,7 +94,6 @@ fun CartScreen(viewModel: FoodViewModel) {
         }
     }
 }
-
 @Composable
 fun CartCard(
     cartitem: InternetData,
