@@ -1,9 +1,11 @@
 package com.example.fooddelivery
 
 
+import InternetData
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,11 +14,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -64,6 +69,7 @@ fun Main() {
     val state by abddbb.uistate.collectAsState()
     val isvisible by abddbb.IsVisible.collectAsState()
     val navController = rememberNavController()
+    val cartIteam by abddbb.emptyListFlow.collectAsState()
 
     //detect the current screen
     val BackStackEntry by navController.currentBackStackEntryAsState() // backstack mathi current backstack ni infor aapshe
@@ -74,14 +80,13 @@ fun Main() {
     if (isvisible == true) {
         Splash()
     } else {
-        Scaffold(
-            topBar = {
-                CustomTopBar(
-                    showBackArrow = currentRoute != ScreenName.first,
-                    onBackClick = { navController.popBackStack() }
-                )
-            },
-            bottomBar = { CustomBottomBar(navController, currentRoute) }) { paddingValues ->
+        Scaffold(topBar = {
+            CustomTopBar(
+                showBackArrow = currentRoute != ScreenName.first,
+                onBackClick = { navController.popBackStack() })
+        }, bottomBar = {
+            CustomBottomBar(navController, currentRoute, cartIteam)
+        }) { paddingValues ->
 
             NavHost(
                 navController = navController,
@@ -89,6 +94,7 @@ fun Main() {
                 modifier = Modifier.padding(paddingValues)
             ) {
                 composable(ScreenName.first) {
+                    //State Hoisting navigation
                     StartScreen { selectedName ->
                         abddbb.EventChange(selectedName)
                         navController.navigate(ScreenName.second)
@@ -98,7 +104,13 @@ fun Main() {
                     InternetItemsScreen(abddbb)
                 }
                 composable(ScreenName.Third) {
-                    CartScreen(abddbb)
+                    CartScreen(
+                        abddbb,
+                        BrowseProducts = {
+                            navController.navigate(ScreenName.first)
+                        }
+
+                    )
                 }
             }
         }
@@ -126,8 +138,7 @@ fun CustomTopBar(showBackArrow: Boolean, onBackClick: () -> Unit) {
                     tint = Color.White,
                     modifier = Modifier
                         .size(26.dp)
-                        .clickable { onBackClick() }
-                )
+                        .clickable { onBackClick() })
 
                 Spacer(modifier = Modifier.width(8.dp))
             }
@@ -158,7 +169,9 @@ fun CustomTopBar(showBackArrow: Boolean, onBackClick: () -> Unit) {
 }
 
 @Composable
-fun CustomBottomBar(navController: NavController, currentroute: String) {
+fun CustomBottomBar(
+    navController: NavController, currentroute: String, cartIteam: List<InternetData>
+) {
 
     Row(
         modifier = Modifier
@@ -171,14 +184,12 @@ fun CustomBottomBar(navController: NavController, currentroute: String) {
 
         // Home icon
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.clickable {}
-        ) {
+            horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.clickable { navController.navigate(ScreenName.first)}) {
             Icon(
                 imageVector = Icons.Default.Home,
                 contentDescription = "Home",
                 tint = Color.White,
-                modifier = Modifier
-                    .size(28.dp)
+                modifier = Modifier.size(28.dp)
             )
             Text(
                 text = "Home", color = Color.White, fontSize = 12.sp
@@ -189,19 +200,35 @@ fun CustomBottomBar(navController: NavController, currentroute: String) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.clickable {
-                if (currentroute != ScreenName.Third){
+                if (currentroute != ScreenName.Third) {
                     navController.navigate(ScreenName.Third)
                 }
 
             },
         ) {
-            Icon(
-                imageVector = Icons.Default.ShoppingCart,
-                contentDescription = "Cart",
-                tint = Color.White,
-                modifier = Modifier
-                    .size(28.dp)
-            )
+            Box {
+                Icon(
+                    imageVector = Icons.Default.ShoppingCart,
+                    contentDescription = "Cart",
+                    tint = Color.White,
+                    modifier = Modifier.size(28.dp)
+                )
+                if (cartIteam.isNotEmpty()) {
+                    Card(
+                        modifier = Modifier.align(alignment = Alignment.TopEnd),
+
+                        shape = CircleShape,
+                        colors = CardDefaults.cardColors(containerColor = Color.Red)
+                    ) {
+                        Text(
+                            cartIteam.size.toString(),
+                            color = Color.White,
+                            fontSize = 12.sp,
+                            modifier = Modifier.padding(4.dp)
+                        )
+                    }
+                }
+            }
             Text(
                 text = "Cart", color = Color.White, fontSize = 12.sp
             )

@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import okhttp3.Dispatcher
 
 class FoodViewModel : ViewModel() {
     private val _uisate = MutableStateFlow(UiState_Model())
