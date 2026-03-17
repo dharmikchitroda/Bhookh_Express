@@ -2,19 +2,22 @@ package com.example.fooddelivery.ui
 
 import FlashApi
 import InternetData
+import android.app.Application
+import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import okhttp3.Dispatcher
 
-class FoodViewModel : ViewModel() {
+class FoodViewModel(application: Application) : AndroidViewModel(application) {
     private val _uisate = MutableStateFlow(UiState_Model())
     val uistate: StateFlow<UiState_Model> = _uisate.asStateFlow()
 
@@ -25,15 +28,25 @@ class FoodViewModel : ViewModel() {
     private val _emptyListFlow = MutableStateFlow<List<InternetData>>(emptyList())
     val emptyListFlow: StateFlow<List<InternetData>> = _emptyListFlow.asStateFlow()
 
+    // use for datastore by prefernce type
+    private val Context.dataStore by preferencesDataStore("cart")
+    private val context = application.applicationContext
 
+    //create a key beacause datastore in key-value pair
+    private val CartIteamKey = stringPreferencesKey("Cart_Iteam")
 
-// this sealed class say i have 3 work only if you can use when your need according one of the three's
+    private suspend fun saveCartItemsToDataStore(){
+        context.dataStore
+    }
+
+    // this sealed class say I have 3 work only if you can use when your need according one of the three's
     sealed class ItemUiState {
         data class Success(var items: List<InternetData>) : ItemUiState()
         object Loading : ItemUiState()
         data class Error(val message: String) : ItemUiState()
     }
-// now itemUiState will dicide which i shoud to use one
+
+    // now itemUiState will dicide which i shoud to use one
     var itemUiState: ItemUiState by mutableStateOf(ItemUiState.Loading)
         private set
 
@@ -53,7 +66,7 @@ class FoodViewModel : ViewModel() {
                 itemUiState = ItemUiState.Success(listResult)
 
             } catch (ex: Exception) {
-                itemUiState = ItemUiState.Error(ex.message?: "Something went wrong")
+                itemUiState = ItemUiState.Error(ex.message ?: "Something went wrong")
             }
         }
     } /* ---> ab bad me iitemUiState me konsa object hain iske according hum ui change kar lenege which ka use karke */
