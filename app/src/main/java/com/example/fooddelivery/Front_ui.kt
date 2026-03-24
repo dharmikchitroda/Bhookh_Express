@@ -2,6 +2,7 @@ package com.example.fooddelivery
 
 
 import InternetData
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -40,12 +41,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.fooddelivery.authentication.LoginScreen
 import com.example.fooddelivery.ui.CartScreen
 import com.example.fooddelivery.ui.FoodViewModel
 import com.example.fooddelivery.ui.InternetItemsScreen
 import com.example.fooddelivery.ui.ScreenName
 import com.example.fooddelivery.ui.Splash
 import com.example.fooddelivery.ui.StartScreen
+import com.google.firebase.auth.FirebaseAuth
 
 data class CardData(var img: Int, var name: String)
 
@@ -62,7 +65,7 @@ object FoodDataSource {
         )
 }
 
-
+val auth = FirebaseAuth.getInstance()
 @Composable
 fun Main() {
     val abddbb: FoodViewModel = viewModel()
@@ -70,6 +73,10 @@ fun Main() {
     val isvisible by abddbb.IsVisible.collectAsState()
     val navController = rememberNavController()
     val cartIteam by abddbb.emptyListFlow.collectAsState()
+
+    //Mujhe Firebase ka login system use karna hai
+
+    val user = abddbb.user.collectAsState()
 
     //detect the current screen
     val BackStackEntry by navController.currentBackStackEntryAsState() // backstack mathi current backstack ni infor aapshe
@@ -79,7 +86,11 @@ fun Main() {
     // for splash screen
     if (isvisible == true) {
         Splash()
-    } else {
+    }
+    else if (user.value == null) {
+        LoginScreen(abddbb)
+    }
+    else {
         Scaffold(topBar = {
             CustomTopBar(
                 showBackArrow = currentRoute != ScreenName.first,
@@ -184,7 +195,8 @@ fun CustomBottomBar(
 
         // Home icon
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.clickable { navController.navigate(ScreenName.first)}) {
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.clickable { navController.navigate(ScreenName.first) }) {
             Icon(
                 imageVector = Icons.Default.Home,
                 contentDescription = "Home",

@@ -1,8 +1,26 @@
+
+/*🔥 Magic Formula:
+
+👉 P → A → D → B
+
+Short	Meaning
+P	Plugins
+A	Android
+D	DefaultConfig
+B	Build
+
+👉 Isko yaad kar:
+
+“Papa Aaye Dinner Banane” 🍛*/
+
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("org.jetbrains.kotlin.plugin.serialization")
+    id("com.google.gms.google-services")
+
 }
 
 android {
@@ -49,6 +67,8 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.compose.ui.text)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -58,13 +78,20 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation("androidx.navigation:navigation-compose:2.7.7")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.10.0")
+
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-scalars:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    
     implementation("io.coil-kt:coil-compose:2.6.0")
+
     //    for datapersistance with preferdatastore
     implementation("androidx.datastore:datastore-preferences:1.2.1")
-    // serialization ke liye
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.0")
+
+    // for firebase
+    implementation(platform("com.google.firebase:firebase-bom:34.11.0"))
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-auth")
 }

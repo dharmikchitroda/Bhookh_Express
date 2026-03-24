@@ -1,7 +1,5 @@
-import kotlinx.serialization.Serializable
 import com.google.gson.annotations.SerializedName
 
-@Serializable
 data class InternetData(
 
     @SerializedName("stringResourceId")

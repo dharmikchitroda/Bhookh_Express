@@ -12,14 +12,15 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseUser
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 
 class FoodViewModel(application: Application) : AndroidViewModel(application) {
     private val _uisate = MutableStateFlow(UiState_Model())
@@ -34,11 +35,28 @@ class FoodViewModel(application: Application) : AndroidViewModel(application) {
 
     // use for datastore by prefernce type
     private val Context.dataStore by preferencesDataStore("cart")
-    private val context = application.applicationContext
+    private val context_variable = application.applicationContext
+
 
     //create a key beacause datastore in key-value pair
     private val CartIteamKey = stringPreferencesKey("Cart_Iteam")
 
+    // for fierbase use
+    private val _user = MutableStateFlow<FirebaseUser?>(null)
+    val user: MutableStateFlow<FirebaseUser?> get() = _user
+
+    private val _PhoneNumber = MutableStateFlow("")
+    val PhoneNumber: MutableStateFlow<String> get() = _PhoneNumber
+
+
+    // for otp
+    private var _otp = MutableStateFlow("")
+    val otp: MutableStateFlow<String> get() = _otp
+
+    // for verificationId
+
+    private var _verificationId = MutableStateFlow("")
+    val verificationId: MutableStateFlow<String> get() = _verificationId
 
     // this sealed class say I have 3 work only if you can use when your need according one of the three's
     sealed class ItemUiState {
@@ -59,17 +77,23 @@ class FoodViewModel(application: Application) : AndroidViewModel(application) {
 
     // add data into the key
     private suspend fun saveCartItemsToDataStore() {
-        context.dataStore.edit { variable_preferences ->
-            variable_preferences[CartIteamKey] = Json.encodeToString(_cartItems.value)
+        context_variable.dataStore.edit { variable_preferences ->
+            // add daatabase for need to data should be obj->json
+            variable_preferences[CartIteamKey] = Gson().toJson(_cartItems.value)
         }
     }
 
     //DataStore se cart items nikal na
     private suspend fun loadCartItemsFromDataStore() {
-        val fullData = context.dataStore.data.first()
+        val fullData = context_variable.dataStore.data.first()
         val cartItemsJson = fullData[CartIteamKey]
-        if (!cartItemsJson.isNullOrEmpty()){
-            _cartItems.value = Json.decodeFromString(cartItemsJson)
+        if (!cartItemsJson.isNullOrEmpty()) {
+            // fatch data from daatabase for need to data should be json -> obj
+
+            val type = object : TypeToken<List<InternetData>>() {}.type
+            val cartList: List<InternetData> = Gson().fromJson(cartItemsJson, type)
+
+            _cartItems.value = cartList
         }
     }
 
@@ -93,6 +117,7 @@ class FoodViewModel(application: Application) : AndroidViewModel(application) {
     // for cart screen add remove function
     fun addToCart(item: InternetData) {
         _cartItems.value = _cartItems.value + item
+
         // use the add data into preferncedataset
         viewModelScope.launch {
             saveCartItemsToDataStore()
@@ -106,6 +131,22 @@ class FoodViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+
+    // setPhoneNumber
+    fun setPhoneNumber(phoneNumber: String) {
+        _PhoneNumber.value = phoneNumber
+    }
+
+    // set otp
+    fun setOtp(value: String) {
+        _otp.value = value
+    }
+
+// for verificationId add by click btn and run firebase callback auto
+
+    fun setverificationId(value: String) {
+        _verificationId.value = value
+    }
     init {
         viewModelScope.launch {
             delay(3000)
