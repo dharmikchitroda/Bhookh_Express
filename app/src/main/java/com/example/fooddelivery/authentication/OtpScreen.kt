@@ -1,12 +1,14 @@
 package com.example.fooddelivery.authentication
 
+import android.app.Activity
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -14,6 +16,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -24,7 +30,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.fooddelivery.auth
 import com.example.fooddelivery.ui.FoodViewModel
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.PhoneAuthCredential
+import com.google.firebase.auth.PhoneAuthProvider
 
 @Composable
 fun OtpScreen(viewModel: FoodViewModel) {
@@ -33,65 +44,50 @@ fun OtpScreen(viewModel: FoodViewModel) {
     val verificationId by viewModel.verificationId.collectAsState()
     val context = androidx.compose.ui.platform.LocalContext.current
 
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(20.dp)
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.large,
+        elevation = CardDefaults.cardElevation(6.dp)
     ) {
-
-        Text("Enter OTP", fontSize = 20.sp)
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        OtpTextField(
-            otp = otp,
-            onOtpChange = { viewModel.setOtp(it) }
-        )
-
-        Spacer(modifier = Modifier.height(30.dp))
-
-        androidx.compose.material3.Button(
-            onClick = {
-                if (otp.length == 6) {
-                    val credential = com.google.firebase.auth.PhoneAuthProvider.getCredential(
-                        verificationId,
-                        otp
-                    )
-                    com.example.fooddelivery.auth.signInWithCredential(credential)
-                        .addOnCompleteListener { task ->
-                            if (task.isSuccessful) {
-                                android.util.Log.d("OTP_DEBUG", "Login Success ✅")
-                                viewModel.user.value = com.example.fooddelivery.auth.currentUser
-                            } else {
-                                android.util.Log.e(
-                                    "OTP_DEBUG",
-                                    "Verification Failed",
-                                    task.exception
-                                )
-                                android.widget.Toast.makeText(
-                                    context,
-                                    "OTP Verification Failed: ${task.exception?.message}",
-                                    android.widget.Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                        }
-                } else {
-                    android.widget.Toast.makeText(
-                        context,
-                        "Enter 6 digit OTP",
-                        android.widget.Toast.LENGTH_SHORT
-                    ).show()
-                }
-            },
-            shape = RoundedCornerShape(8.dp),
-            colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                containerColor = Color(0xFFFFA726)
-            ),
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(55.dp)
+                .padding(16.dp)
         ) {
-            Text(text = "Verify OTP", color = Color.White, fontSize = 16.sp)
+
+            Text("Enter OTP", fontSize = 20.sp)
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            OtpTextField(
+                otp = otp,
+                onOtpChange = { viewModel.setOtp(it) }
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = {
+                    if (otp.isNotEmpty()) {
+                        val credential = PhoneAuthProvider.getCredential(verificationId!!, otp)
+                        signInWithPhoneAuthCredential(credential,context,viewModel)
+
+                    } else {
+                        Toast.makeText(context, "Please Enter 6 Digits OTP", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                },
+                shape = RoundedCornerShape(8.dp),
+                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFFFFA726)
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(55.dp)
+            ) {
+                Text(text = "Verify OTP", color = Color.White, fontSize = 16.sp)
+            }
         }
     }
 }
@@ -108,14 +104,16 @@ fun OtpTextField(
                 onOtpChange(it)
             }
         },
-        Modifier.fillMaxSize(),
+        Modifier.fillMaxWidth(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
     ) {
         // ahiya compsury text battavu j pade baki kai show nahi thai
 
         Row(
             horizontalArrangement = Arrangement.SpaceEvenly,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(4.dp)
         ) {
             repeat(6) { index ->
                 // aa final number give me now i can print diffrent way
@@ -130,7 +128,8 @@ fun OtpTextField(
                             2.dp,
                             Color.Gray,
                             shape = RoundedCornerShape(8.dp)
-                        ).padding(8.dp),
+                        )
+                        .padding(8.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(text = char.toString(), fontSize = 20.sp)
@@ -143,4 +142,29 @@ fun OtpTextField(
 
     }
 
+}
+
+
+// otp verification code
+private fun signInWithPhoneAuthCredential(
+    credential: PhoneAuthCredential,
+    context: Context,
+    viewModel: FoodViewModel
+) {
+    auth.signInWithCredential(credential)
+        .addOnCompleteListener(context as Activity) { task ->
+            if (task.isSuccessful) {
+
+                val user = task.result?.user
+                viewModel.setUser(user)
+                Toast.makeText(context, "Authentication Successful", Toast.LENGTH_SHORT).show()
+
+            } else {
+
+                if (task.exception is FirebaseAuthInvalidCredentialsException) {
+                    Toast.makeText(context, "Invalid OTP", Toast.LENGTH_SHORT).show()
+                }
+
+            }
+        }
 }

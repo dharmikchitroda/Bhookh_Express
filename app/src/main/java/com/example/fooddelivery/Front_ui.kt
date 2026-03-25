@@ -2,7 +2,6 @@ package com.example.fooddelivery
 
 
 import InternetData
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -66,17 +65,21 @@ object FoodDataSource {
 }
 
 val auth = FirebaseAuth.getInstance()
+
 @Composable
 fun Main() {
-    val abddbb: FoodViewModel = viewModel()
-    val state by abddbb.uistate.collectAsState()
-    val isvisible by abddbb.IsVisible.collectAsState()
+    val viewmodel: FoodViewModel = viewModel()
+    val state by viewmodel.uistate.collectAsState()
+    val isvisible by viewmodel.IsVisible.collectAsState()
     val navController = rememberNavController()
-    val cartIteam by abddbb.emptyListFlow.collectAsState()
+    val cartIteam by viewmodel.emptyListFlow.collectAsState()
 
     //Mujhe Firebase ka login system use karna hai
 
-    val user = abddbb.user.collectAsState()
+    val user = viewmodel.user.collectAsState()
+    // this is shoulb be null in startinh
+    viewmodel.setUser(auth.currentUser)
+
 
     //detect the current screen
     val BackStackEntry by navController.currentBackStackEntryAsState() // backstack mathi current backstack ni infor aapshe
@@ -86,11 +89,9 @@ fun Main() {
     // for splash screen
     if (isvisible == true) {
         Splash()
-    }
-    else if (user.value == null) {
-        LoginScreen(abddbb)
-    }
-    else {
+    } else if (user.value == null) {
+        LoginScreen(viewmodel)
+    } else {
         Scaffold(topBar = {
             CustomTopBar(
                 showBackArrow = currentRoute != ScreenName.first,
@@ -107,16 +108,16 @@ fun Main() {
                 composable(ScreenName.first) {
                     //State Hoisting navigation
                     StartScreen { selectedName ->
-                        abddbb.EventChange(selectedName)
+                        viewmodel.EventChange(selectedName)
                         navController.navigate(ScreenName.second)
                     }
                 }
                 composable(ScreenName.second) {
-                    InternetItemsScreen(abddbb)
+                    InternetItemsScreen(viewmodel)
                 }
                 composable(ScreenName.Third) {
                     CartScreen(
-                        abddbb,
+                        viewmodel,
                         BrowseProducts = {
                             navController.navigate(ScreenName.first)
                         }

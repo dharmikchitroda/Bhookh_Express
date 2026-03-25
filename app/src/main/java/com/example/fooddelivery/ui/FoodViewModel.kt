@@ -141,6 +141,9 @@ class FoodViewModel(application: Application) : AndroidViewModel(application) {
     fun setOtp(value: String) {
         _otp.value = value
     }
+    fun setUser(value: FirebaseUser?) {
+        _user.value = value
+    }
 
 // for verificationId add by click btn and run firebase callback auto
 
@@ -155,5 +158,7 @@ class FoodViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 }
+
+
 
 
