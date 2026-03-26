@@ -49,7 +49,7 @@ fun LoginScreen(
             verificationId: String,
             token: PhoneAuthProvider.ForceResendingToken,
         ) {
-            Log.d("OTP_DEBUG", "Code Sent ✅")
+
             viewModel.setverificationId(verificationId)
         }
     }

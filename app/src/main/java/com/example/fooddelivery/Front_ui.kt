@@ -22,12 +22,16 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -48,6 +52,7 @@ import com.example.fooddelivery.ui.ScreenName
 import com.example.fooddelivery.ui.Splash
 import com.example.fooddelivery.ui.StartScreen
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.launch
 
 data class CardData(var img: Int, var name: String)
 
@@ -76,8 +81,8 @@ fun Main() {
 
     //Mujhe Firebase ka login system use karna hai
 
-    val user = viewmodel.user.collectAsState()
-    // this is shoulb be null in startinh
+    val user = viewmodel.   user.collectAsState()
+    // this is shoulb be null in starting
     viewmodel.setUser(auth.currentUser)
 
 
@@ -92,45 +97,48 @@ fun Main() {
     } else if (user.value == null) {
         LoginScreen(viewmodel)
     } else {
-        Scaffold(topBar = {
-            CustomTopBar(
-                showBackArrow = currentRoute != ScreenName.first,
-                onBackClick = { navController.popBackStack() })
-        }, bottomBar = {
-            CustomBottomBar(navController, currentRoute, cartIteam)
-        }) { paddingValues ->
 
-            NavHost(
-                navController = navController,
-                startDestination = ScreenName.first,
-                modifier = Modifier.padding(paddingValues)
-            ) {
-                composable(ScreenName.first) {
-                    //State Hoisting navigation
-                    StartScreen { selectedName ->
-                        viewmodel.EventChange(selectedName)
-                        navController.navigate(ScreenName.second)
-                    }
-                }
-                composable(ScreenName.second) {
-                    InternetItemsScreen(viewmodel)
-                }
-                composable(ScreenName.Third) {
-                    CartScreen(
-                        viewmodel,
-                        BrowseProducts = {
-                            navController.navigate(ScreenName.first)
-                        }
-
+            Scaffold(topBar = {
+                CustomTopBar(
+                    showBackArrow = currentRoute != ScreenName.first,
+                    onBackClick = { navController.popBackStack() },
+                    onMenuClick = {}
                     )
+            }, bottomBar = {
+                CustomBottomBar(navController, currentRoute, cartIteam)
+            }) { paddingValues ->
+
+                NavHost(
+                    navController = navController,
+                    startDestination = ScreenName.first,
+                    modifier = Modifier.padding(paddingValues)
+                ) {
+                    composable(ScreenName.first) {
+                        //State Hoisting navigation
+                        StartScreen { selectedName ->
+                            viewmodel.EventChange(selectedName)
+                            navController.navigate(ScreenName.second)
+                        }
+                    }
+                    composable(ScreenName.second) {
+                        InternetItemsScreen(viewmodel)
+                    }
+                    composable(ScreenName.Third) {
+                        CartScreen(
+                            viewmodel, BrowseProducts = {
+                                navController.navigate(ScreenName.first)
+                            }
+
+                        )
+                    }
                 }
             }
         }
     }
-}
+
 
 @Composable
-fun CustomTopBar(showBackArrow: Boolean, onBackClick: () -> Unit) {
+fun CustomTopBar(showBackArrow: Boolean, onBackClick: () -> Unit,onMenuClick: () -> Unit) {
 
     Row(
         modifier = Modifier
@@ -174,8 +182,9 @@ fun CustomTopBar(showBackArrow: Boolean, onBackClick: () -> Unit) {
                 imageVector = Icons.Default.Person,
                 contentDescription = "User",
                 tint = Color.White,
-                modifier = Modifier.size(26.dp)
-            )
+                modifier = Modifier
+                    .size(26.dp)
+                    .clickable { onMenuClick() })
         }
     }
 }

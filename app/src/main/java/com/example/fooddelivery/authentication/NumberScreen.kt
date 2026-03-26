@@ -73,7 +73,7 @@ fun NumberScreen(viewModel: FoodViewModel,callbacks: PhoneAuthProvider.OnVerific
 
             Button(
                 onClick = {
-                    Log.d("CLICK", "Button clicked")
+
                     val options = PhoneAuthOptions.newBuilder(auth)
                         .setPhoneNumber("+91$phone") // Phone number to verify
                         .setTimeout(60L, TimeUnit.SECONDS) // Timeout and unit

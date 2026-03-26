@@ -143,8 +143,6 @@ fun OtpTextField(
     }
 
 }
-
-
 // otp verification code
 private fun signInWithPhoneAuthCredential(
     credential: PhoneAuthCredential,
