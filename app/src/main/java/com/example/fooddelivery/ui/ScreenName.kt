@@ -5,4 +5,5 @@ object ScreenName {
     var second = "second_Screen"
 
     var Third  = "Third_Screen"
+    var Fourth = "Fourth_Screen"
 }

@@ -4,6 +4,7 @@ import FlashApi
 import InternetData
 import android.app.Application
 import android.content.Context
+import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -57,6 +58,9 @@ class FoodViewModel(application: Application) : AndroidViewModel(application) {
 
     private var _verificationId = MutableStateFlow("")
     val verificationId: MutableStateFlow<String> get() = _verificationId
+
+    private var _UserImage = MutableStateFlow<Uri?>(null)
+    val UserImage: MutableStateFlow<Uri?> get() = _UserImage
 
     // this sealed class say I have 3 work only if you can use when your need according one of the three's
     sealed class ItemUiState {
@@ -144,12 +148,23 @@ class FoodViewModel(application: Application) : AndroidViewModel(application) {
     fun setUser(value: FirebaseUser?) {
         _user.value = value
     }
+    fun ClearUser(){
+        _user.value = null
+        _PhoneNumber.value = ""
+        _otp.value = ""
+        _verificationId.value = ""
+    }
 
 // for verificationId add by click btn and run firebase callback auto
 
     fun setverificationId(value: String) {
         _verificationId.value = value
     }
+
+    fun setImage(uri: Uri?) {
+        _UserImage.value = uri
+    }
+
     init {
         viewModelScope.launch {
             delay(3000)
