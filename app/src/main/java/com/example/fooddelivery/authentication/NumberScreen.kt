@@ -83,6 +83,7 @@ fun NumberScreen(viewModel: FoodViewModel,callbacks: PhoneAuthProvider.OnVerific
                     // “Firebase, OTP bhej do”
                     PhoneAuthProvider.verifyPhoneNumber(options)
 
+
                 },
 
                 shape = MaterialTheme.shapes.medium, colors = ButtonDefaults.buttonColors(

@@ -2,8 +2,10 @@ package com.example.fooddelivery.authentication
 
 import android.app.Activity
 import android.content.Context
+import android.text.format.DateUtils
 import android.widget.Toast
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,23 +29,26 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.fooddelivery.auth
 import com.example.fooddelivery.ui.FoodViewModel
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.PhoneAuthCredential
+import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider
+import java.util.concurrent.TimeUnit
 
 @Composable
-fun OtpScreen(viewModel: FoodViewModel) {
+fun OtpScreen(viewModel: FoodViewModel,callbacks: PhoneAuthProvider.OnVerificationStateChangedCallbacks) {
 
     val otp by viewModel.otp.collectAsState()
     val verificationId by viewModel.verificationId.collectAsState()
     val context = androidx.compose.ui.platform.LocalContext.current
-
+    val time = viewModel.Timer.collectAsState()
+    val phone by viewModel.PhoneNumber.collectAsState()
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -71,7 +76,8 @@ fun OtpScreen(viewModel: FoodViewModel) {
                 onClick = {
                     if (otp.isNotEmpty()) {
                         val credential = PhoneAuthProvider.getCredential(verificationId!!, otp)
-                        signInWithPhoneAuthCredential(credential,context,viewModel)
+                        signInWithPhoneAuthCredential(credential, context, viewModel)
+
 
                     } else {
                         Toast.makeText(context, "Please Enter 6 Digits OTP", Toast.LENGTH_SHORT)
@@ -88,6 +94,28 @@ fun OtpScreen(viewModel: FoodViewModel) {
             ) {
                 Text(text = "Verify OTP", color = Color.White, fontSize = 16.sp)
             }
+
+            Spacer(modifier = Modifier.height(15.dp))
+
+            Text(
+                text = if (time.value > 0L) "Resend OTP in ${DateUtils.formatElapsedTime(time.value)} seconds" else "Resend OTP",
+                color = Color.Black,
+                fontSize = 16.sp,
+                fontWeight = if (time.value > 0L) FontWeight.Normal else FontWeight.Bold,
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .clickable(enabled = time.value <= 0L) {
+                        val options = PhoneAuthOptions.newBuilder(auth)
+                            .setPhoneNumber("+91$phone") // Phone number to verify
+                            .setTimeout(60L, TimeUnit.SECONDS) // Timeout and unit
+                            .setActivity(context as Activity) // Activity (for callback binding)
+                            .setCallbacks(callbacks) // OnVerificationStateChangedCallbacks
+                            .build()
+                        // “Firebase, OTP bhej do”
+                        PhoneAuthProvider.verifyPhoneNumber(options)
+
+                    },
+            )
         }
     }
 }
@@ -143,6 +171,7 @@ fun OtpTextField(
     }
 
 }
+
 // otp verification code
 private fun signInWithPhoneAuthCredential(
     credential: PhoneAuthCredential,

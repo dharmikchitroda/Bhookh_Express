@@ -16,6 +16,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseUser
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -61,6 +62,10 @@ class FoodViewModel(application: Application) : AndroidViewModel(application) {
 
     private var _UserImage = MutableStateFlow<Uri?>(null)
     val UserImage: MutableStateFlow<Uri?> get() = _UserImage
+
+    private var _Timer = MutableStateFlow(60L)
+    val Timer: MutableStateFlow<Long> get() = _Timer
+
 
     // this sealed class say I have 3 work only if you can use when your need according one of the three's
     sealed class ItemUiState {
@@ -164,6 +169,20 @@ class FoodViewModel(application: Application) : AndroidViewModel(application) {
     fun setImage(uri: Uri?) {
         _UserImage.value = uri
     }
+
+private var timerJob: Job? = null
+    // use for time 60 to 0
+    fun startTimer() {
+        timerJob?.cancel()
+        _Timer.value = 60L // first var loop chalshe 0 thai jashe to biji vcar click karshe tyare 60 karvu padshe ne
+        timerJob = viewModelScope.launch {
+            while(_Timer.value > 0) {
+                delay(1000)
+                _Timer.value--
+            }
+        }
+    }
+
 
     init {
         viewModelScope.launch {

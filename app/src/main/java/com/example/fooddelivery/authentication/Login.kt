@@ -48,10 +48,14 @@ fun LoginScreen(
         override fun onCodeSent(
             verificationId: String,
             token: PhoneAuthProvider.ForceResendingToken,
+
+
         ) {
 
             viewModel.setverificationId(verificationId)
-        }
+         // code aavi gya pachi j timer sharu thashe
+            viewModel.startTimer()
+         }
     }
 
     Box(
@@ -95,7 +99,7 @@ fun LoginScreen(
                 NumberScreen(viewModel, callbacks)
             } else // OtpScreen for otp
             {
-                OtpScreen(viewModel)
+                OtpScreen(viewModel,callbacks)
             }
 
         }

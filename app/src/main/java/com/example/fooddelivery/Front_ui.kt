@@ -196,14 +196,14 @@ fun CustomTopBar(
                 Image(
                     painter = rememberAsyncImagePainter(imageUri.value),
                     contentDescription = null, contentScale = ContentScale.Crop,
-                    modifier = Modifier.size(26.dp).clip(CircleShape),
-                )
+                    modifier = Modifier.size(30.dp).clip(CircleShape) .clickable { onUserClick() })
+
             } else Icon(
                 imageVector = Icons.Default.Person,
                 contentDescription = "User",
                 tint = Color.White,
                 modifier = Modifier
-                    .size(26.dp)
+                    .size(30.dp)
                     .clickable { onUserClick() })
         }
     }
