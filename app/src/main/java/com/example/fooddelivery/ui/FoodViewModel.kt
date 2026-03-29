@@ -66,6 +66,9 @@ class FoodViewModel(application: Application) : AndroidViewModel(application) {
     private var _Timer = MutableStateFlow(60L)
     val Timer: MutableStateFlow<Long> get() = _Timer
 
+    private var _isLoading = MutableStateFlow(false)
+    val isLoadding: MutableStateFlow<Boolean> get() = _isLoading
+
 
     // this sealed class say I have 3 work only if you can use when your need according one of the three's
     sealed class ItemUiState {
@@ -150,10 +153,12 @@ class FoodViewModel(application: Application) : AndroidViewModel(application) {
     fun setOtp(value: String) {
         _otp.value = value
     }
+
     fun setUser(value: FirebaseUser?) {
         _user.value = value
     }
-    fun ClearUser(){
+
+    fun ClearUser() {
         _user.value = null
         _PhoneNumber.value = ""
         _otp.value = ""
@@ -170,17 +175,24 @@ class FoodViewModel(application: Application) : AndroidViewModel(application) {
         _UserImage.value = uri
     }
 
-private var timerJob: Job? = null
+    private var timerJob: Job? = null
+
     // use for time 60 to 0
     fun startTimer() {
         timerJob?.cancel()
-        _Timer.value = 60L // first var loop chalshe 0 thai jashe to biji vcar click karshe tyare 60 karvu padshe ne
+        _Timer.value =
+            60L // first var loop chalshe 0 thai jashe to biji vcar click karshe tyare 60 karvu padshe ne
         timerJob = viewModelScope.launch {
-            while(_Timer.value > 0) {
+            while (_Timer.value > 0) {
                 delay(1000)
                 _Timer.value--
             }
         }
+    }
+
+    // for when otp come untill disable and shw btn again
+    fun setLoading(value: Boolean) {
+        _isLoading.value = value
     }
 
 

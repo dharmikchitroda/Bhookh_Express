@@ -3,6 +3,7 @@ package com.example.fooddelivery.authentication
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,6 +12,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -34,6 +38,7 @@ fun LoginScreen(
 ) {
 
     val varificationId by viewModel.verificationId.collectAsState()
+    val isLoading by viewModel.isLoadding.collectAsState()
 
     // callback
     val callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
@@ -42,7 +47,7 @@ fun LoginScreen(
         }
 
         override fun onVerificationFailed(e: FirebaseException) {
-
+            Log.d("LoginScreen", "onVerificationFailed: ${e.message}")
         }
 
         override fun onCodeSent(
@@ -50,12 +55,16 @@ fun LoginScreen(
             token: PhoneAuthProvider.ForceResendingToken,
 
 
-        ) {
+            ) {
 
             viewModel.setverificationId(verificationId)
-         // code aavi gya pachi j timer sharu thashe
+            // code aavi gya pachi j timer sharu thashe
             viewModel.startTimer()
-         }
+            Log.d("LoginScreen", "onCodeSent: $verificationId")
+
+            // otp aa gaya, loading band
+            viewModel.setLoading(false)
+        }
     }
 
     Box(
@@ -99,10 +108,23 @@ fun LoginScreen(
                 NumberScreen(viewModel, callbacks)
             } else // OtpScreen for otp
             {
-                OtpScreen(viewModel,callbacks)
+                OtpScreen(viewModel, callbacks)
             }
 
         }
 
+        if (varificationId.isNotEmpty()) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = "Back",
+                tint = Color.Black,
+                modifier = Modifier
+                    .padding(20.dp, top = 23.dp)
+                    .clickable {
+                        viewModel.setverificationId("") // when we back so i want to new mobile or new genrate otp  may be when clcik send otp new genrate otp
+                        viewModel.setOtp("") // otp clear
+                    }
+            )
+        }
     }
 }

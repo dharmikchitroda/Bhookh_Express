@@ -1,17 +1,18 @@
 package com.example.fooddelivery.authentication
 
 import android.app.Activity
-import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -21,6 +22,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -28,18 +30,19 @@ import com.example.fooddelivery.auth
 import com.example.fooddelivery.ui.FoodViewModel
 import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider
-import androidx.compose.ui.text.TextStyle
 import java.util.concurrent.TimeUnit
 
 @Composable
-fun NumberScreen(viewModel: FoodViewModel,callbacks: PhoneAuthProvider.OnVerificationStateChangedCallbacks) {
+fun NumberScreen(
+    viewModel: FoodViewModel,
+    callbacks: PhoneAuthProvider.OnVerificationStateChangedCallbacks
+) {
 
 
     val context = LocalContext.current
 
     val phone by viewModel.PhoneNumber.collectAsState()
-
-
+    val isloading by viewModel.isLoadding.collectAsState()
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -50,7 +53,6 @@ fun NumberScreen(viewModel: FoodViewModel,callbacks: PhoneAuthProvider.OnVerific
         Column(
             modifier = Modifier.padding(20.dp)
         ) {
-
 
 
             OutlinedTextField(
@@ -73,7 +75,9 @@ fun NumberScreen(viewModel: FoodViewModel,callbacks: PhoneAuthProvider.OnVerific
 
             Button(
                 onClick = {
-
+                    // start loading
+                    viewModel.setLoading(true)
+                    // ← loading me button disable
                     val options = PhoneAuthOptions.newBuilder(auth)
                         .setPhoneNumber("+91$phone") // Phone number to verify
                         .setTimeout(60L, TimeUnit.SECONDS) // Timeout and unit
@@ -82,19 +86,25 @@ fun NumberScreen(viewModel: FoodViewModel,callbacks: PhoneAuthProvider.OnVerific
                         .build()
                     // “Firebase, OTP bhej do”
                     PhoneAuthProvider.verifyPhoneNumber(options)
-
-
                 },
-
+                enabled = !isloading && phone.length == 10,
                 shape = MaterialTheme.shapes.medium, colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFFFFA726)
                 ), modifier = Modifier
                     .fillMaxWidth()
                     .height(55.dp)
-            ) {// this text for show
-                Text(
-                    text = "Send OTP", color = Color.White, fontSize = 16.sp
-                )
+            ) {
+                if (isloading) {
+                    CircularProgressIndicator(
+                        color = Color.White,
+                        modifier = Modifier
+                            .padding(4.dp)
+                            .size(24.dp),
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Text(text = "Send OTP", color = Color.White, fontSize = 16.sp)
+                }
             }
         }
     }
