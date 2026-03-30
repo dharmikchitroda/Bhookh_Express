@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -22,6 +21,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -196,7 +197,10 @@ fun CustomTopBar(
                 Image(
                     painter = rememberAsyncImagePainter(imageUri.value),
                     contentDescription = null, contentScale = ContentScale.Crop,
-                    modifier = Modifier.size(30.dp).clip(CircleShape) .clickable { onUserClick() })
+                    modifier = Modifier
+                        .size(30.dp)
+                        .clip(CircleShape)
+                        .clickable { onUserClick() })
 
             } else Icon(
                 imageVector = Icons.Default.Person,
@@ -277,3 +281,4 @@ fun CustomBottomBar(
         }
     }
 }
+

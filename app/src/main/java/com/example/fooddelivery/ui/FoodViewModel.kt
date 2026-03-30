@@ -69,6 +69,9 @@ class FoodViewModel(application: Application) : AndroidViewModel(application) {
     private var _isLoading = MutableStateFlow(false)
     val isLoadding: MutableStateFlow<Boolean> get() = _isLoading
 
+    // use for dialog show or not
+    private val _DialogStatus = MutableStateFlow(false)
+    val DialogStatus: MutableStateFlow<Boolean> get() = _DialogStatus
 
     // this sealed class say I have 3 work only if you can use when your need according one of the three's
     sealed class ItemUiState {
@@ -193,6 +196,11 @@ class FoodViewModel(application: Application) : AndroidViewModel(application) {
     // for when otp come untill disable and shw btn again
     fun setLoading(value: Boolean) {
         _isLoading.value = value
+    }
+// set dialog status true fasle
+
+    fun setDialogStatus(value: Boolean) {
+        _DialogStatus.value = value
     }
 
 
