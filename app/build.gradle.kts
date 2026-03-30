@@ -1,4 +1,3 @@
-
 /*🔥 Magic Formula:
 
 👉 P → A → D → B
@@ -82,7 +81,7 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-scalars:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-    
+
     implementation("io.coil-kt:coil-compose:2.6.0")
 
     //    for datapersistance with preferdatastore
@@ -94,4 +93,6 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:34.11.0"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-auth")
+// for Realtime Database
+    implementation("com.google.firebase:firebase-database")
 }

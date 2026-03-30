@@ -13,7 +13,9 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.database.database
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Job
@@ -72,6 +74,11 @@ class FoodViewModel(application: Application) : AndroidViewModel(application) {
     // use for dialog show or not
     private val _DialogStatus = MutableStateFlow(false)
     val DialogStatus: MutableStateFlow<Boolean> get() = _DialogStatus
+
+    // Use for firebase realtime database
+    val database = Firebase.database
+    val myRef = database.getReference("message")
+
 
     // this sealed class say I have 3 work only if you can use when your need according one of the three's
     sealed class ItemUiState {
