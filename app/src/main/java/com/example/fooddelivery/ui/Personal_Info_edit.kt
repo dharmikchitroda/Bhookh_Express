@@ -15,6 +15,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -27,13 +28,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.fooddelivery.FireRealDb
+import com.example.fooddelivery.auth
 
 @Composable
 fun PersonalInfoForm(viewModel: FoodViewModel, navController: NavController) {
     val firstName by viewModel.UserFirstName.collectAsState()
     val lastName by viewModel.UserlastName.collectAsState()
     val DabRef = FireRealDb.reference
- val contextt = LocalContext.current
+    val contextt = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -105,12 +107,13 @@ fun PersonalInfoForm(viewModel: FoodViewModel, navController: NavController) {
             // Save Button
             Button(
                 onClick = {
-                    DabRef.child("Users").child("firstName").setValue(firstName)
-                    DabRef.child("Users").child("lastName").setValue(lastName)
+                    val userId = auth.currentUser?.uid ?: return@Button
+                    DabRef.child("Users").child(userId).child("firstName").setValue(firstName)
+                    DabRef.child("Users").child(userId).child("lastName").setValue(lastName)
                     Toast.makeText(contextt, "Saved!", Toast.LENGTH_SHORT).show()
-                   navController.popBackStack()
+                    navController.popBackStack()
                 },
-                enabled = !firstName.isEmpty()&&!lastName.isEmpty(),
+                enabled = !firstName.isEmpty() && !lastName.isEmpty(),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(48.dp),
@@ -120,5 +123,10 @@ fun PersonalInfoForm(viewModel: FoodViewModel, navController: NavController) {
                 Text("Save", color = Color.White, fontSize = 15.sp)
             }
         }
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchuserdata()
+    }
     }
 }
+

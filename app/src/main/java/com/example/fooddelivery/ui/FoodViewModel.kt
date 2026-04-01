@@ -13,6 +13,8 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+    import com.example.fooddelivery.FireRealDb
+import com.example.fooddelivery.auth
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.database
@@ -88,7 +90,6 @@ class FoodViewModel(application: Application) : AndroidViewModel(application) {
 
     private var _UserlastName = MutableStateFlow("")
     val UserlastName: MutableStateFlow<String> get() = _UserlastName
-
 
 
     // this sealed class say I have 3 work only if you can use when your need according one of the three's
@@ -225,9 +226,11 @@ class FoodViewModel(application: Application) : AndroidViewModel(application) {
     fun setUserName(value: String) {
         _UserName.value = value
     }
+
     fun setUserfirstName(value: String) {
         _UserFirstName.value = value
     }
+
     fun setUserLastName(value: String) {
         _UserlastName.value = value
     }
@@ -240,8 +243,18 @@ class FoodViewModel(application: Application) : AndroidViewModel(application) {
             getItems()
         }
     }
+
+
+    fun fetchuserdata() {
+        val UserId = auth.currentUser?.uid ?: return
+
+        val DabRef = FireRealDb.reference
+        DabRef.child("Users")
+            .child(UserId)
+            .get().addOnSuccessListener { snapshot ->
+                _UserFirstName.value = snapshot.child("firstName").value.toString()
+                _UserlastName.value = snapshot.child("lastName").value.toString()
+            }
+    }
+
 }
-
-
-
-
