@@ -33,6 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.fooddelivery.FireRealDb
 import com.example.fooddelivery.auth
 import com.example.fooddelivery.ui.FoodViewModel
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
@@ -49,6 +50,9 @@ fun OtpScreen(viewModel: FoodViewModel,callbacks: PhoneAuthProvider.OnVerificati
     val context = androidx.compose.ui.platform.LocalContext.current
     val time = viewModel.Timer.collectAsState()
     val phone by viewModel.PhoneNumber.collectAsState()
+
+    // for firebase db refernce
+
 
     Card(
         modifier = Modifier.fillMaxWidth(),

@@ -21,8 +21,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -50,11 +48,13 @@ import com.example.fooddelivery.authentication.LoginScreen
 import com.example.fooddelivery.ui.CartScreen
 import com.example.fooddelivery.ui.FoodViewModel
 import com.example.fooddelivery.ui.InternetItemsScreen
+import com.example.fooddelivery.ui.PersonalInfoForm
 import com.example.fooddelivery.ui.ScreenName
 import com.example.fooddelivery.ui.Splash
 import com.example.fooddelivery.ui.StartScreen
 import com.example.fooddelivery.ui.UserProfile
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 
 data class CardData(var img: Int, var name: String)
 
@@ -72,6 +72,8 @@ object FoodDataSource {
 }
 
 val auth = FirebaseAuth.getInstance()
+val FireRealDb = FirebaseDatabase.getInstance()
+
 
 @Composable
 fun Main() {
@@ -135,13 +137,17 @@ fun Main() {
                     CartScreen(
                         viewmodel, BrowseProducts = {
                             navController.navigate(ScreenName.first)
-                        }
+                        })
+                }
 
-                    )
+                composable(ScreenName.Fourth) {  // ← yeh add NAHI kiya
+                    UserProfile(viewmodel, { navController.navigate(ScreenName.fifthe) })
                 }
-                composable(ScreenName.Fourth) {
-                    UserProfile(viewmodel)
+                composable(ScreenName.fifthe) {  // ← yeh add NAHI kiya
+                    PersonalInfoForm(viewmodel,navController)
                 }
+
+
             }
         }
     }

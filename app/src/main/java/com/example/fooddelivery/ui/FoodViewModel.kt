@@ -79,6 +79,17 @@ class FoodViewModel(application: Application) : AndroidViewModel(application) {
     val database = Firebase.database
     val myRef = database.getReference("message")
 
+    // name for user
+    private var _UserName = MutableStateFlow("")
+    val UserName: MutableStateFlow<String> get() = _UserName
+
+    private var _UserFirstName = MutableStateFlow("")
+    val UserFirstName: MutableStateFlow<String> get() = _UserFirstName
+
+    private var _UserlastName = MutableStateFlow("")
+    val UserlastName: MutableStateFlow<String> get() = _UserlastName
+
+
 
     // this sealed class say I have 3 work only if you can use when your need according one of the three's
     sealed class ItemUiState {
@@ -208,6 +219,17 @@ class FoodViewModel(application: Application) : AndroidViewModel(application) {
 
     fun setDialogStatus(value: Boolean) {
         _DialogStatus.value = value
+    }
+
+    // set user profile name
+    fun setUserName(value: String) {
+        _UserName.value = value
+    }
+    fun setUserfirstName(value: String) {
+        _UserFirstName.value = value
+    }
+    fun setUserLastName(value: String) {
+        _UserlastName.value = value
     }
 
 
