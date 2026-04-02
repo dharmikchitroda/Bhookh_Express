@@ -1,18 +1,26 @@
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
+import retrofit2.http.Query
 
-private const val BASE_URL = "https://training-uploads.internshala.com/"
+private const val BASE_URL = "https://www.themealdb.com/api/json/v1/1/"
 
 
-private val retrofit = Retrofit.Builder()
+    private val retrofit = Retrofit.Builder()
     .addConverterFactory(GsonConverterFactory.create())
     .baseUrl(BASE_URL)
     .build()
 
 interface FlashApiServise {
-    @GET("android/grocery_delivery_app/items.json")
-    suspend fun getItems(): List<InternetData> // Ye function time le sakta hai Ye coroutine me hi chalega Ye main thread block nahi karega
+    // 1. Home screen - saari categories
+    @GET("categories.php")
+    suspend fun getCategories(): List<InternetData> // Ye function time le sakta hai Ye coroutine me hi chalega Ye main thread block nahi karega
+
+    @GET("filter.php")         // endpoint
+    suspend fun getMealsByCategory(
+        @Query("c") category: String   // ?c=Seafood or ?c=Chicken
+    ): List<Meal>
+
 
 }
 

@@ -1,19 +1,16 @@
-import com.google.gson.annotations.SerializedName
+import java.util.Locale
 
 data class InternetData(
+    val idCategory: String,
+    val strCategory: String,      // "Chicken", "Seafood" etc
+    val strCategoryThumb: String, // image URL
+    val strCategoryDescription: String
+)
 
-    @SerializedName("stringResourceId")
-    val name: String,
 
-    @SerializedName("itemCategoryId")
-    val categoryName: String,
 
-    @SerializedName("itemQuantity")
-    val quantity: String,
-
-    @SerializedName("item_price")
-    val itemPrice: Int,
-
-    @SerializedName("imageResourceId")
-    val imageSource: String
+data class Meal(
+    val strMeal: String,        // name
+    val strMealThumb: String,   // photo
+    val idMeal: String          // id - baad mein detail ke liye
 )
