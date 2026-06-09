@@ -45,8 +45,8 @@ fun SecondScreen(item: InternetData, viewModel: FoodViewModel) {
             Box {
 
                 AsyncImage(
-                    model = item.imageSource,
-                    item.name,
+                    model = item.image ?: "",
+                    contentDescription = item.title ?: "",
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(140.dp)
@@ -69,7 +69,7 @@ fun SecondScreen(item: InternetData, viewModel: FoodViewModel) {
             Column(modifier = Modifier.padding(12.dp)) {
 
                 Text(
-                    text = item.name,
+                    text = item.title ?: "",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1

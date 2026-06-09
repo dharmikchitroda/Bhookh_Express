@@ -13,7 +13,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-    import com.example.fooddelivery.FireRealDb
+import com.example.fooddelivery.FireRealDb
 import com.example.fooddelivery.auth
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseUser
@@ -131,14 +131,21 @@ class FoodViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun getItems() {
+    fun getItems(query: String? = null) {
         viewModelScope.launch {
             // first of all loading assing kar diya
             itemUiState = ItemUiState.Loading
             try {
-                // jab kuch aya to ae kar diya
-                val listResult = FlashApi.retrofitService.getItems()
-                itemUiState = ItemUiState.Success(listResult)
+                // Mapping category name to appropriate search query term
+                val apiQuery = when (query?.trim()?.lowercase()) {
+                    "fresh fruits" -> "fruit"
+                    "fresh vegetables" -> "vegetable"
+                    "beverages" -> "beverage"
+                    else -> query
+                }
+                
+                val listResult = FlashApi.retrofitService.getRecipes(query = apiQuery)
+                itemUiState = ItemUiState.Success(listResult.results)
                 // aek bar add karne ke vo data hum fatch karlenge dusri bar datastore mese aa jaye iss liye
                 loadCartItemsFromDataStore()
 
@@ -209,8 +216,7 @@ class FoodViewModel(application: Application) : AndroidViewModel(application) {
                 delay(1000)
                 _Timer.value--
             }
-        }
-    }
+        }    }
 
     // for when otp come untill disable and shw btn again
     fun setLoading(value: Boolean) {
@@ -240,7 +246,6 @@ class FoodViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             delay(3000)
             _IsVisible.value = false
-            getItems()
         }
     }
 

@@ -149,8 +149,8 @@ fun CartCard(
         ) {
 
             AsyncImage(
-                model = cartitem.imageSource,
-                contentDescription = cartitem.name,
+                model = cartitem.image ?: "",
+                contentDescription = cartitem.title ?: "",
                 modifier = Modifier
                     .padding(start = 4.dp)
                     .weight(3f)
@@ -165,7 +165,7 @@ fun CartCard(
             ) {
 
                 Text(
-                    text = cartitem.name,
+                    text = cartitem.title ?: "",
                     fontSize = 20.sp,
                     maxLines = 1
                 )

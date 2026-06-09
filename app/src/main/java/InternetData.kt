@@ -1,16 +1,14 @@
 import java.util.Locale
 
 data class InternetData(
-    val idCategory: String,
-    val strCategory: String,      // "Chicken", "Seafood" etc
-    val strCategoryThumb: String, // image URL
-    val strCategoryDescription: String
-)
+    val id: Int,
+    val title: String? = null,      // "Chicken", "Seafood" etc
+    val image: String? = null, // image URL
+) {
+    val itemPrice: Int
+        get() = (id % 150) + 50
+}
 
-
-
-data class Meal(
-    val strMeal: String,        // name
-    val strMealThumb: String,   // photo
-    val idMeal: String          // id - baad mein detail ke liye
+data class RecipeResponse(
+    val results: List<InternetData>  // "results" — Spoonacular ka JSON key
 )

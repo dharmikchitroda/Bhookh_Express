@@ -35,8 +35,12 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun StartScreen(
-    onItemsClicked: (String) -> Unit
+    onItemsClicked: (String) -> Unit,
+    viewModel: FoodViewModel
 ) {
+    val Status = viewModel.itemUiState
+
+
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         Modifier

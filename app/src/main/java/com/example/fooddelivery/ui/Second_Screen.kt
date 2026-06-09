@@ -34,16 +34,12 @@ fun InternetItemsScreen(viewModel: FoodViewModel) {
 
         is FoodViewModel.ItemUiState.Success -> {
 
-            val filteredList = state.items.filter {
-                it.categoryName == viewModel.uistate.value.MoveText // kona par click kae and shu show thashe aena mate
-            }
-
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
                 contentPadding = PaddingValues(3.dp),
                 verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-                items(filteredList) { item ->
+                items(state.items) { item ->
                     SecondScreen(item, viewModel)
                 }
             }

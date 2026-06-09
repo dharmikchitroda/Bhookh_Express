@@ -58,20 +58,17 @@ import com.google.firebase.database.FirebaseDatabase
 
 data class CardData(var img: Int, var name: String)
 
-
 object FoodDataSource {
     val foodList = listOf(
-
         CardData(R.drawable.hvww, "Fresh Fruits"),
         CardData(R.drawable.khg, "Pizza"),
         CardData(R.drawable.jgv, "Fresh Vegetables"),
         CardData(R.drawable.hvww, "Beverages"),
-        CardData(R.drawable.bollsw, "Fresh Vegetables"),
-
-        )
+        CardData(R.drawable.bollsw, "Fresh Vegetables")
+    )
 }
 
-val auth = FirebaseAuth.getInstance()
+val auth = FirebaseAuth.getInstance()cd path/to/your-project
 val FireRealDb = FirebaseDatabase.getInstance()
 
 
@@ -125,10 +122,14 @@ fun Main() {
             ) {
                 composable(ScreenName.first) {
                     //State Hoisting navigation
-                    StartScreen { selectedName ->
-                        viewmodel.EventChange(selectedName)
-                        navController.navigate(ScreenName.second)
-                    }
+                    StartScreen(
+                        onItemsClicked = { selectedName ->
+                            viewmodel.EventChange(selectedName)
+                            viewmodel.getItems(selectedName)
+                            navController.navigate(ScreenName.second)
+                        },
+                        viewModel = viewmodel
+                    )
                 }
                 composable(ScreenName.second) {
                     InternetItemsScreen(viewmodel)
